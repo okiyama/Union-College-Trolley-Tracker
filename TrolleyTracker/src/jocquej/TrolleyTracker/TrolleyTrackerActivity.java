@@ -28,10 +28,11 @@ import jocquej.TrolleyTracker.R;
  * Also displays the trolleys path.
  * Check trolley.union.edu for more info on the project
  * @author Julian Jocque
- * @version 8/21/12
+ * @version 9/23/12
  */
 
-/* TODO: Include a menu with refresh(possible?) and info on app/trolley/site
+/* TODO: 
+ * 1 3/4. Include a menu with refresh and info on app/trolley/site
  * 6. Clean up trolley adding, make more OO
  * 5. If it is not the times that the trolley runs pop up a warning, have a trolleyIsRunning() method
  * 4. Make testing class, remove testing code before putting on github
@@ -39,7 +40,7 @@ import jocquej.TrolleyTracker.R;
  * 2. Add current location of the user to the map. This would require at least
  * 		a refresh button, but ideally the map would just refresh itself every 5-30 seconds, with an optional
  * 		refresh now button at the bottom. Don't use the menu button.
- * 3. Check to make sure the maps API key is good, not a debugging one. Remove my api key from the Github upload.
+ * 3. Check to make sure the maps API key is good, not a debugging one. 
  * 1 1/2. Clean up old loading screen code
  * 
  * Future feature: "Where will the trolley be in X minutes/at this time"
@@ -59,7 +60,7 @@ public class TrolleyTrackerActivity extends MapActivity {
 	public static final String LOG_TAG = "TrolleyTrackerActivity";
 	public static final String SITE_URL = "http://trolley.union.edu/app/stats.php";
 	
-	private static final boolean DEBUG = false;
+	//private static final boolean DEBUG = false; //Removed debugging code for release to Github.
 	//This is an array of x, y points for the path of the trolley.
 	private static final int[][] trolleyPathPoints = {{42820710, -73934040}, {42821160, -73933850}, {42820740, -73931480},
 		{42820650, -73931450}, {42819300, -73933710}, {42817090, -73935190}, {42816470, -73933470}, {42817470, -73932800},
@@ -78,7 +79,7 @@ public class TrolleyTrackerActivity extends MapActivity {
 	
 	private CustomMapView mapView;
 	private GeoPoint center;
-	private ProgressDialog loadingDialog;
+	//private ProgressDialog loadingDialog;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -99,11 +100,6 @@ public class TrolleyTrackerActivity extends MapActivity {
 		addTrolley();
 
 	    mapView.invalidate(); //Recommended by Android to be called after changing Mapview Overlays
-	    
-		if (DEBUG)
-		{
-			runTests();
-		}
 	}
 	
 	@Override
@@ -112,31 +108,6 @@ public class TrolleyTrackerActivity extends MapActivity {
 		super.onStart();
 		//loadingDialog.dismiss();
 	}
-
-	/**
-	 * Runs tests on some methods
-	 * Will be moved to a dedicated testing class in the future
-	 */
-	private void runTests()
-	{
-		testFailMessage();
-	}
-	
-	/**
-	 * Tests the failMessage method
-	 * All these run at once, should have a way to have one button wait for the next to finish
-	 */
-	private void testFailMessage()
-	{
-		failMessage("The app will now close", true);
-		failMessage("Close the app?", false);
-		failMessage(null, true);
-		failMessage(null, false);
-	}
-	
-	/**
-	 * Handles a user double tapping to zoom in on the Map
-	 */
 	
 	/**
 	 * Sets the maps settings so they are correct for the trolley's route
@@ -175,10 +146,10 @@ public class TrolleyTrackerActivity extends MapActivity {
 		for (int i=0; i < trolleyPathPoints.length; i++)
 		{
 			currentX = trolleyPathPoints[i][0];
-			Log.v(TrolleyTrackerActivity.LOG_TAG,"Current X is: " + currentX);
+			//Log.v(TrolleyTrackerActivity.LOG_TAG,"Current X is: " + currentX);
 
 			currentY = trolleyPathPoints[i][1];
-			Log.v(TrolleyTrackerActivity.LOG_TAG,"Current Y is: " + currentY);
+			//Log.v(TrolleyTrackerActivity.LOG_TAG,"Current Y is: " + currentY);
 			
 			toAdd = new GeoPoint(currentX, currentY);
 			trolleyPoints.addOverlay(new OverlayItem(toAdd, "", "")); //empty string so the overlays don't have a pop-up
@@ -235,7 +206,8 @@ public class TrolleyTrackerActivity extends MapActivity {
 		{ 
 			//Couldn't connect to server, so we tell user and close
 			Log.e(LOG_TAG,"doc was null");
-			failMessage("Could not connect to server. Most likely you don't have an internet connection. Press okay to exit.", true);
+			failMessage("Could not connect to server. Most likely you don't have an internet connection. " +
+					"If you do, please reopen the app. Press okay to exit.", true);
 		}
 		else
 		{
