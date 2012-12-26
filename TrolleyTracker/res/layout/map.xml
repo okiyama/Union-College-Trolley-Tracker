@@ -7,3 +7,4 @@
     android:clickable="true"
     android:apiKey="@string/api_key"
 />
+<!-- You must provide your own Google Maps v2 API Key in the apiKey string -->

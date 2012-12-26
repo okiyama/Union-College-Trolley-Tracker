@@ -12,15 +12,14 @@ import com.google.android.maps.MapController;
 import com.google.android.maps.Overlay;
 import com.google.android.maps.OverlayItem;
 
+import jocquej.TrolleyTracker.R;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import jocquej.TrolleyTracker.R;
 
 /**
  * Main class for the Union College Trolley Tracker App
@@ -28,30 +27,7 @@ import jocquej.TrolleyTracker.R;
  * Also displays the trolleys path.
  * Check trolley.union.edu for more info on the project
  * @author Julian Jocque
- * @version 9/23/12
- */
-
-/* TODO: 
- * 1 3/4. Include a menu with refresh and info on app/trolley/site
- * 6. Clean up trolley adding, make more OO
- * 5. If it is not the times that the trolley runs pop up a warning, have a trolleyIsRunning() method
- * 4. Make testing class, remove testing code before putting on github
- * 1. Use ASyncTask to add a loading screen on app startup for when the MapView is loading.
- * 2. Add current location of the user to the map. This would require at least
- * 		a refresh button, but ideally the map would just refresh itself every 5-30 seconds, with an optional
- * 		refresh now button at the bottom. Don't use the menu button.
- * 3. Check to make sure the maps API key is good, not a debugging one. 
- * 1 1/2. Clean up old loading screen code
- * 
- * Future feature: "Where will the trolley be in X minutes/at this time"
- * How to achieve it:
- * Setup: Ping the trolley once per minute as it goes through its path. Would be better to be
- * on it while it does this to avoid any anomolies.
- * Once we have this data:
- * When the user asks for 3 minutes ahead all we do is find the point out
- * of these points nearest to current trolley position, then go 3 data points
- * ahead and draw that to the map.
- * This would all go in a new class.
+ * @version 12/25/12
  */
 
 public class TrolleyTrackerActivity extends MapActivity {
@@ -60,7 +36,6 @@ public class TrolleyTrackerActivity extends MapActivity {
 	public static final String LOG_TAG = "TrolleyTrackerActivity";
 	public static final String SITE_URL = "http://trolley.union.edu/app/stats.php";
 	
-	//private static final boolean DEBUG = false; //Removed debugging code for release to Github.
 	//This is an array of x, y points for the path of the trolley.
 	private static final int[][] trolleyPathPoints = {{42820710, -73934040}, {42821160, -73933850}, {42820740, -73931480},
 		{42820650, -73931450}, {42819300, -73933710}, {42817090, -73935190}, {42816470, -73933470}, {42817470, -73932800},
@@ -79,7 +54,6 @@ public class TrolleyTrackerActivity extends MapActivity {
 	
 	private CustomMapView mapView;
 	private GeoPoint center;
-	//private ProgressDialog loadingDialog;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) 
@@ -87,8 +61,6 @@ public class TrolleyTrackerActivity extends MapActivity {
 	    super.onCreate(savedInstanceState);
 	    
 	    setContentView(R.layout.map);
-	    
-	    //loadingDialog = ProgressDialog.show(this, "Loading...", "Please wait");
 	    
 	    mapView = (CustomMapView) findViewById(R.id.mapview);
 	    center = new GeoPoint(UNION_X_CENTER_MICRODEGREES, UNION_Y_CENTER_MICRODEGREES);
@@ -102,12 +74,6 @@ public class TrolleyTrackerActivity extends MapActivity {
 	    mapView.invalidate(); //Recommended by Android to be called after changing Mapview Overlays
 	}
 	
-	@Override
-	public void onStart()
-	{
-		super.onStart();
-		//loadingDialog.dismiss();
-	}
 	
 	/**
 	 * Sets the maps settings so they are correct for the trolley's route
@@ -123,12 +89,12 @@ public class TrolleyTrackerActivity extends MapActivity {
 	/**
 	 * Makes a MapPath out of the trolley's path which gets added to the overlays.
 	 * This in turn makes the MapPath get drawn to the MapView.
-	 * @throws IOException If we don't find TrolleyPathPoints.txt
 	 */
 	private void addTrolleyPath()
 	{
 		Paint brush = new Paint();
 		setDefaults(brush);
+		
 		//To get our assets we "navigate" to the resources folder then to assets then to the proper file
 		Drawable blankImage = this.getResources().getDrawable(R.drawable.blank);
 		
@@ -141,7 +107,7 @@ public class TrolleyTrackerActivity extends MapActivity {
 		int currentY;
 		GeoPoint toAdd;
 		
-		//Here we read all of the points for the trolleys path from a txt file
+		//Here we read all of the points for the trolleys path from the trolleyPathPoints 2D array
 		//and add them all as Geopoints to trolleyPoints.
 		for (int i=0; i < trolleyPathPoints.length; i++)
 		{
@@ -218,10 +184,10 @@ public class TrolleyTrackerActivity extends MapActivity {
 			//Log.d(LOG_TAG, "yStat, string in degrees: " + yStat);
 	
 			Float xFloat = Float.parseFloat(xStat) * 1000000; //This gets x in microdegrees
-			Float yFloat = Float.parseFloat(yStat) * 1000000; //Now we have y in microdegrees
+			Float yFloat = Float.parseFloat(yStat) * 1000000; //This gets y in microdegrees
 			//Log.d(LOG_TAG, "yFloat, microdegrees: " + yFloat);
 			
-			trolleyX = Math.round(xFloat); //Turns our Float in to an Int
+			trolleyX = Math.round(xFloat); //Turns our Floats into Ints
 			trolleyY = Math.round(yFloat);
 			//Log.d(LOG_TAG, "TrolleyX is: " + trolleyX + " TrolleyY is: " + trolleyY);
 			
@@ -239,8 +205,8 @@ public class TrolleyTrackerActivity extends MapActivity {
 	 * Displays an error message to the user.
 	 * @param toDisplay String to show them
 	 * @param closeApp Whether or not the message should always close the app. If true there will only be
-	 * one button shown that kill the app. If false there will be one button with "Yes" to continue, and one button
-	 * with "No" to kill the app.
+	 * one button shown that kills the app. If false there will be one button with "Yes" which continues, and one button
+	 * with "No" which kills the app.
 	 */
 	private void failMessage(String toDisplay, boolean closeApp)
 	{
